@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import useMusic from "../hooks/useMusic";
+import { useMusic } from "../contexts/MusicContext";
 
 export default function MusicPlayer() {
     const {
@@ -28,12 +28,12 @@ export default function MusicPlayer() {
         const newTime = parseFloat(e.target.value);
         audio.currentTime = newTime;
         setCurrentTime(newTime);
-    }
+    };
 
     function handleVolumeChange(e) {
         const newVolume = parseFloat(e.target.value);
         setVolume(newVolume);
-    }
+    };
 
     useEffect(() => {
         const audio = audioRef.current;
@@ -44,7 +44,7 @@ export default function MusicPlayer() {
         } else {
             audio.pause();
         }
-    }, [isPlaying])
+    }, [isPlaying]);
 
     useEffect(() => {
         const audio = audioRef.current;
@@ -52,7 +52,7 @@ export default function MusicPlayer() {
 
         audio.volume = volume;
 
-    }, [volume])
+    }, [volume]);
 
     useEffect(() => {
         const audio = audioRef.current;
@@ -71,15 +71,30 @@ export default function MusicPlayer() {
         }
 
         audio.addEventListener("loadedmetadata", handleLoadedMetadata);
+        audio.addEventListener("canplay", handleLoadedMetadata);
         audio.addEventListener("timeupdate", handleTimeUpdate);
         audio.addEventListener("ended", handleEnded);
         
         return () => {
             audio.removeEventListener("loadedmetadata", handleLoadedMetadata);
+            audio.removeEventListener("canplay", handleLoadedMetadata);
             audio.removeEventListener("timeupdate", handleTimeUpdate);
             audio.removeEventListener("ended", handleEnded);
         }
-    }, [setDuration, setCurrentTime, currentTrack])
+    }, [setDuration, setCurrentTime, currentTrack, nextTrack]);
+
+    useEffect(() => {
+         const audio = audioRef.current;
+        if (!audio) return;
+
+        audio.load();
+        setCurrentTime(0);
+        setDuration(0);
+    }, [currentTrack, setCurrentTime, setDuration])
+
+    const progressPercentage = duration > 0 ? (currentTime / duration) * 100 : 0;
+
+
     return (
         <div className="music-player">
             <audio
@@ -111,7 +126,7 @@ export default function MusicPlayer() {
                     value={currentTime || 0}
                     className="progress-bar"
                     onChange={handleTimeChange}
-                // style={{}}
+                style={{"--progress": `${progressPercentage}%`}}
                 />
                 <span className="time">
                     {formatTime(duration)}
