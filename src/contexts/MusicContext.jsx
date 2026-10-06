@@ -41,6 +41,7 @@ export default function MusicProvider({ children }) {
     const [duration, setDuration] = useState(0);
     const [volume, setVolume] = useState(1);
     const [isPlaying, setIsPlaying] = useState(false);
+    const [playlists, setPlaylists] = useState([]);
 
     function handlePlaySong(song, index) {
         setCurrentTrack(song);
@@ -85,6 +86,16 @@ export default function MusicProvider({ children }) {
         return `${minutes}:${seconds.toString().padStart(2, "0")}`
     }
 
+    function createPlaylist(name) {
+        const newPlaylist = {
+            id: Date.now(),
+            name,
+            songs: []
+        };
+
+        setPlaylists((prev) => [...prev, newPlaylist]);
+    }
+
     return (
         <MusicContext.Provider value={{
             allSongs,
@@ -103,6 +114,8 @@ export default function MusicProvider({ children }) {
             isPlaying,
             volume,
             setVolume,
+            createPlaylist,
+            playlists,
         }}>
             {children}
         </MusicContext.Provider>
