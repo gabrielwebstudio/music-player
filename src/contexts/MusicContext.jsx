@@ -96,11 +96,26 @@ export default function MusicProvider({ children }) {
         setPlaylists((prev) => [...prev, newPlaylist]);
     }
 
+    function deletePlaylist(playlistId) {
+        setPlaylists((prev) => prev.filter((playlist) => playlist.id !== playlistId));
+    }
+
+    function addSongToPlaylist(playlistId, song) {
+        setPlaylists((prev) => prev.map((playlist) => {
+            if(playlist.id === playlistId) {
+                return {...playlist, songs: [...playlist.songs, song]}
+            } else {
+                return playlist;
+            }
+        }))
+    }
+
     return (
         <MusicContext.Provider value={{
             allSongs,
             handlePlaySong,
             currentTrack,
+            setCurrentTrack,
             currentTrackIndex,
             currentTime,
             setCurrentTime,
@@ -116,6 +131,8 @@ export default function MusicProvider({ children }) {
             setVolume,
             createPlaylist,
             playlists,
+            addSongToPlaylist,
+            deletePlaylist,
         }}>
             {children}
         </MusicContext.Provider>
