@@ -1,4 +1,4 @@
-import { createContext, useContext, useState } from "react";
+import { createContext, useContext, useState, useEffect } from "react";
 
 const songs = [
     {
@@ -10,10 +10,10 @@ const songs = [
     },
     {
         id: 2,
-        title: "I don't care",
+        title: "Piano",
         artist: "Gabriel",
-        url: "/songs/I don't care.mp3",
-        duration: "1:45",
+        url: "/songs/Piano.mp3",
+        duration: "3:36",
     },
     {
         id: 3,
@@ -29,6 +29,13 @@ const songs = [
         url: "/songs/Trap.mp3",
         duration: "7:12",
     },
+    {
+        id: 5,
+        title: "LoFi2",
+        artist: "Gabriel",
+        url: "/songs/LoFi2.mp3",
+        duration: "2:26",
+    },
 ]
 
 export const MusicContext = createContext();
@@ -42,6 +49,22 @@ export default function MusicProvider({ children }) {
     const [volume, setVolume] = useState(1);
     const [isPlaying, setIsPlaying] = useState(false);
     const [playlists, setPlaylists] = useState([]);
+
+    useEffect(() => {
+        const storedPlaylists = localStorage.getItem("musicPlayerPlaylists");
+
+        if(storedPlaylists) {
+            setPlaylists(JSON.parse(storedPlaylists));
+        }
+    }, [])
+
+    useEffect(() => {
+        if (playlists.length > 0) {
+            localStorage.setItem("musicPlayerPlaylists", JSON.stringify(playlists))
+        } else {
+            localStorage.removeItem("musicPlayerPlaylists");
+        }
+    }, [playlists]);
 
     function handlePlaySong(song, index) {
         setCurrentTrack(song);
